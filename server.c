@@ -544,9 +544,15 @@ int main(int argc, char* argv[])
 	exit(0);
     }
 
-    /* Get current directory */
-    sprintf(www_path, "%s",getenv("PWD"));
-    strcat(www_path, "/www");
+    if(argc >= 5){
+	sprintf(www_path, "%s",  argv[5]);
+	printf("argv[5] = %s \n", argv[5] );
+    } else {
+    	/* Get current directory */
+    	sprintf(www_path, "%s",getenv("PWD"));
+    	strcat(www_path, "/www");
+    }
+
     printf("path:  %s \n", www_path);
 
     /* Initialize client connections */

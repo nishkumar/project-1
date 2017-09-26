@@ -3,7 +3,7 @@ CFLAGS=-I.
 DEPS = parse.h y.tab.h
 OBJ = y.tab.o lex.yy.o parse.o example.o
 FLAGS = -g -Wall
-OBJ2 = y.tab.o lex.yy.o parse.o echo_server.o
+OBJ2 = y.tab.o lex.yy.o parse.o server.o
 
 default:all
 
@@ -30,6 +30,6 @@ client:
 
 clean:
 	rm -f *~ *.o example lex.yy.c y.tab.c y.tab.h
-	rm -f *~ client server log.txt
+	rm -f *~ client lisod log.txt
 	@echo "############### Make Clean Success ############## \n"
 
