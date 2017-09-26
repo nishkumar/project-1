@@ -35,6 +35,8 @@
  *                              Server settings                               *
  ******************************************************************************/
 #define DEBUG			1
+#define TRUE 			1
+#define FALSE 			0
 #define WWW_PATH		""
 #define ECHO_PORT		9999
 #define TYPE_LEN		64
@@ -50,8 +52,6 @@
 #define MIN_PORT		1025
 #define MAX_PORT		9999
 
-#define TRUE 1
-#define FALSE 0
 
 /******************************************************************************
  *				Global variables			      *
@@ -59,13 +59,14 @@
 int client_sockets[MAX_CONN];	/* Array to track all connections */
 int max_sd;			/* Max socket descriptor */
 fd_set readfds;			/* Read file descriptors for incoming conn */
-char log_buf[LOG_BUF_SIZE];
-char www_path[FILE_PATH_SIZE];
-int server_port = 9999;
+char log_buf[LOG_BUF_SIZE];	/* Buffer to store log string */
+char www_path[FILE_PATH_SIZE];	/* Path to www folder */
+int server_port = 9999;		/* Default server port for HTTP */
 
-struct tm tm;
+struct tm tm;			
 time_t now;
 char date_time[TYPE_LEN];
+
 /******************************************************************************
  *                              Helper functions                              *
  ******************************************************************************/
@@ -93,6 +94,15 @@ void log_write(char* msg, int print_time)
     memset(log_buf, 0, LOG_BUF_SIZE);
 }
 
+
+/*
+ * Function to display incorrect parameter error message 
+ */
+void usage_error(){
+    printf("### Incorrect parameters  ### \n");
+    printf("command: ./lisod <port> \n");
+    printf("<port> must be between %d - %d \n", MIN_PORT, MAX_PORT);
+}
 
 
 /*
@@ -442,13 +452,13 @@ void handle_request_error(int id, Request *request, char *http_response, char *d
 
 
 /*
- * Parse client http request
+ * Function to handle incoming http request
  */
-void parse_request(int index, int sd, char *buf, ssize_t read_ret)
+void handle_http_request(int index, int sd, char *buf, ssize_t read_ret)
 {
     int i = 0;
 
-    //Parse the request
+    // Parse the request
     Request *request = parse(buf, read_ret, sd);
 	
     // Check if request header is valid
@@ -538,20 +548,7 @@ void parse_request(int index, int sd, char *buf, ssize_t read_ret)
     return;
 }
 
-/*
- * Handle http request
- */
-int handle_request(int sd, char *buf)
-{
-    return 0;   
-}
 
-
-void usage_error(){
-    printf("### Incorrect parameters  ### \n");
-    printf("command: ./lisod <port> \n");
-    printf("<port> must be between %d - %d \n", MIN_PORT, MAX_PORT);
-}
 
 /******************************************************************************
  *                                Server Core                                 *
@@ -726,7 +723,7 @@ int main(int argc, char* argv[])
                             inet_ntoa(cli_addr.sin_addr), ntohs(cli_addr.sin_port));
                     log_write(log_buf, TRUE);
 
-		    parse_request(i, sd, buf, readret);
+		    handle_http_request(i, sd, buf, readret);
 		    //close_connection(i);
                     // send(sd , buf , readret , 0);
 		    // handle_request(sd, buf)

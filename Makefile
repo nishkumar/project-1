@@ -7,7 +7,7 @@ OBJ2 = y.tab.o lex.yy.o parse.o server.o
 
 default:all
 
-all: example lisod client
+all: example lisod
 
 lex.yy.c: lexer.l
 	flex $^
@@ -23,9 +23,6 @@ example: $(OBJ)
 
 lisod: $(OBJ2)
 	$(CC) -o $@ $^ $(CFLAGS)
-
-client:
-	@gcc echo_client.c -o client -Wall -Werror
 	@echo "############### Build Successful ############### \n"
 
 clean:
