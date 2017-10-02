@@ -146,10 +146,10 @@ void parse_file_type(char *filename, char *file_type)
         strcpy(file_type, "application/javascript");
     else if (strstr(filename, ".gif"))
         strcpy(file_type, "image/gif");
-    else if (strstr(filename, ".png"))
-        strcpy(file_type, "image/png");
     else if (strstr(filename, ".jpg") || strstr(filename, "jpeg"))
         strcpy(file_type, "image/jpeg");
+    else if (strstr(filename, ".png"))
+        strcpy(file_type, "image/png");
     else if (strstr(filename, ".wav"))
         strcpy(file_type, "audio/x-wav");
     else
@@ -228,7 +228,8 @@ int send_response_header(int id, Request *request)
     struct tm tm;
     struct stat sbuf;
     time_t now;
-    char   filename[BUF_SIZE], content[BUF_SIZE], filetype[TYPE_LEN], tbuf[TYPE_LEN], dbuf[TYPE_LEN]; 
+    char filename[BUF_SIZE], content[BUF_SIZE], temp[BUF_SIZE];
+    char filetype[TYPE_LEN], tbuf[TYPE_LEN], dbuf[TYPE_LEN]; 
  
     if (validate_request_file(id, request) == -1) 
     {
@@ -249,16 +250,23 @@ int send_response_header(int id, Request *request)
     strftime(dbuf, TYPE_LEN, "%a, %d %b %Y %H:%M:%S %Z", &tm);
 
     sprintf(content, "HTTP/1.1 %s \r\n", HTTP_RESPONSE_200);
+    strcpy(temp, content);
+
     if (client_sockets[id] == 0)
         sprintf(content, "%sConnection: close\r\n", content);
     else
         sprintf(content, "%sConnection: keep-alive\r\n", content);
 
-    sprintf(content, "%sContent-Length: %ld\r\n", content, sbuf.st_size);
-    sprintf(content, "%sContent-Type: %s\r\n", content, filetype);
-    sprintf(content, "%sDate: %s\r\n", content, dbuf);
-    sprintf(content, "%sLast-Modified: %s\r\n", content, tbuf);
-    sprintf(content, "%sServer: Liso/1.0\r\n\r\n", content);
+    strcpy(temp, content);	
+    sprintf(content, "%sContent-Length: %ld\r\n", temp, sbuf.st_size);
+    strcpy(temp, content);
+    sprintf(content, "%sContent-Type: %s\r\n", temp, filetype);
+    strcpy(temp, content);
+    sprintf(content, "%sDate: %s\r\n", temp, dbuf);
+    strcpy(temp, content);
+    sprintf(content, "%sLast-Modified: %s\r\n", temp, tbuf);
+    strcpy(temp, content);
+    sprintf(content, "%sServer: Liso/1.0\r\n\r\n", temp);
     send(client_sockets[id], content, strlen(content), 0);
 
 #ifdef DEBUG    
@@ -310,7 +318,7 @@ int  handle_head_request(int id,  Request *request)
     struct tm tm;
     struct stat sbuf;
     time_t now;
-    char filename[FILE_PATH_SIZE], content[BUF_SIZE];
+    char filename[FILE_PATH_SIZE], temp[BUF_SIZE], content[BUF_SIZE];
     char filetype[TYPE_LEN], tbuf[TYPE_LEN], dbuf[TYPE_LEN]; 
  
    
@@ -332,16 +340,22 @@ int  handle_head_request(int id,  Request *request)
     strftime(dbuf, TYPE_LEN, "%a, %d %b %Y %H:%M:%S %Z", &tm);
 
     sprintf(content, "HTTP/1.1 200 OK\r\n");
+    strcpy(temp, content);
     if (client_sockets[id] > 0)
-        sprintf(content, "%sConnection: close\r\n", content);
+        sprintf(content, "%sConnection: close\r\n", temp);
     else
-        sprintf(content, "%sConnection: keep-alive\r\n", content);
+        sprintf(content, "%sConnection: keep-alive\r\n", temp);
 
-    sprintf(content, "%sContent-Length: %ld\r\n", content, sbuf.st_size);
-    sprintf(content, "%sContent-Type: %s\r\n", content, filetype);
-    sprintf(content, "%sDate: %s\r\n", content, dbuf);
-    sprintf(content, "%sLast-Modified: %s\r\n", content, tbuf);
-    sprintf(content, "%sServer: Liso/1.0\r\n\r\n", content);
+    strcpy(temp, content);
+    sprintf(content, "%sContent-Length: %ld\r\n", temp, sbuf.st_size);
+    strcpy(temp, content);
+    sprintf(content, "%sContent-Type: %s\r\n", temp, filetype);
+    strcpy(temp, content);
+    sprintf(content, "%sDate: %s\r\n", temp, dbuf);
+    strcpy(temp, content);
+    sprintf(content, "%sLast-Modified: %s\r\n", temp, tbuf);
+    strcpy(temp, content);
+    sprintf(content, "%sServer: Liso/1.0\r\n\r\n", temp);
     send(client_sockets[id], content, strlen(content), 0);
 
 #ifdef DEBUG    
@@ -369,8 +383,9 @@ void handle_post_request(int id,  Request *request)
     struct tm tm;
     struct stat sbuf;
     time_t now;
-    char   content[BUF_SIZE], tbuf[TYPE_LEN], dbuf[TYPE_LEN];
-
+    char content[BUF_SIZE], tbuf[TYPE_LEN], dbuf[TYPE_LEN];
+    char temp[BUF_SIZE]; 
+   	
     tm = *gmtime(&sbuf.st_mtime);
     strftime(tbuf, TYPE_LEN, "%a, %d %b %Y %H:%M:%S %Z", &tm);
     now = time(0);
@@ -378,14 +393,21 @@ void handle_post_request(int id,  Request *request)
     strftime(dbuf, TYPE_LEN, "%a, %d %b %Y %H:%M:%S %Z", &tm);
 
     sprintf(content, "HTTP/1.1 %s \r\n", HTTP_RESPONSE_200);
+    strcpy(temp, content);
+
     if (client_sockets[id] == 0)
-        sprintf(content, "%sConnection: close\r\n", content);
+        sprintf(content, "%sConnection: close\r\n", temp);
     else
-        sprintf(content, "%sConnection: keep-alive\r\n", content);
-    sprintf(content, "%sContent-Length: 0\r\n", content);
-    sprintf(content, "%sContent-Type: text/html\r\n", content);    
-    sprintf(content, "%sDate: %s\r\n", content, dbuf);
-    sprintf(content, "%sServer: Liso/1.0\r\n\r\n", content);
+        sprintf(content, "%sConnection: keep-alive\r\n", temp);
+    
+    strcpy(temp, content);
+    sprintf(content, "%sContent-Length: 0\r\n", temp);
+    strcpy(temp, content);
+    sprintf(content, "%sContent-Type: text/html\r\n", temp);
+    strcpy(temp, content);    
+    sprintf(content, "%sDate: %s\r\n", temp, dbuf);
+    strcpy(temp, content);
+    sprintf(content, "%sServer: Liso/1.0\r\n\r\n", temp);
     send(client_sockets[id], content, strlen(content), 0);
 
 #ifdef DEBUG    
@@ -414,7 +436,7 @@ void handle_request_error(int id, Request *request, char *http_response, char *d
     if (client_sockets[id] != 0) 
         sprintf(header, "%sConnection: close\r\n", header);
     sprintf(header, "%sContent-type: text/html\r\n", header);
-    sprintf(header, "%sContent-length: %d\r\n\r\n", header, (int)strlen(body));
+    sprintf(header, "%sContent-length: %d\r\n\r\n", header, 0);
     
     if(request == NULL)
     {
@@ -529,17 +551,15 @@ void handle_http_request(int index, int sd, char *buf, ssize_t read_ret)
     }
 
     if(strcasecmp(request->http_method, "HEAD") == 0)
-    {	printf(" HEAD request \n");
+    {
         handle_head_request(index, request);
     }
     else if(strcasecmp(request->http_method, "GET") == 0)
     {
-	printf(" GET request \n");
         handle_get_request(index, request);
     }
     else if(strcasecmp(request->http_method, "POST") == 0)
     {
-	printf(" POST request \n");
         handle_post_request(index, request);
     }
 
