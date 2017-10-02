@@ -37,6 +37,7 @@
 #define DEBUG			1
 #define TRUE 			1
 #define FALSE 			0
+#define SERVER_VERSION		"HTTP/1.1"
 #define WWW_PATH		""
 #define ECHO_PORT		9999
 #define TYPE_LEN		64
@@ -465,7 +466,7 @@ void handle_http_request(int index, int sd, char *buf, ssize_t read_ret)
     if(request == NULL)
      {
 	char * description = "Invalid HTTP header!";
-	handle_request_error(index, request, HTTP_STATUS_505, description);
+	handle_request_error(index, request, HTTP_RESPONSE_505, description);
 	free(request->headers);
     	free(request);
 	return;
@@ -507,7 +508,7 @@ void handle_http_request(int index, int sd, char *buf, ssize_t read_ret)
     if(strcasecmp(request->http_version, "HTTP/1.1") != 0)
     {
 	char * description = "Liso server only supports HTTP/1.1";
-        handle_request_error(index, request, HTTP_STATUS_505, description);
+        handle_request_error(index, request, HTTP_RESPONSE_505, description);
         free(request->headers);
         free(request);
 	printf(" Invalid HTTP version \n");
@@ -520,7 +521,7 @@ void handle_http_request(int index, int sd, char *buf, ssize_t read_ret)
 	strcasecmp(request->http_method, "POST"))
      {
 	char * desc = "Requested method is not supported by liso server.";
-        handle_request_error(index, request, HTTP_STATUS_501, desc);
+        handle_request_error(index, request, HTTP_RESPONSE_501, desc);
         free(request->headers);
         free(request);
 	printf("Method not supported \n");
